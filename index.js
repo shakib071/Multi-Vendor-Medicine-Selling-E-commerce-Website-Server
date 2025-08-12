@@ -38,7 +38,23 @@ async function run() {
     res.send("Hello world from server");
     });
 
+    //get user role
     
+    app.get('/users-role/:uid', async(req,res)=> {
+      const uid = req.params.uid;
+
+      try{
+        const user = await usersCollection.findOne({uid});
+        if(!user){
+          return res.status(404).json({ message: 'User not found' });
+        }
+        res.send({role: user.role});
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
+
+    });
 
 
     //save user
