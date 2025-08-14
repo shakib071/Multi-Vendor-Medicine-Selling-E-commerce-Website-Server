@@ -108,6 +108,20 @@ async function run() {
       }
     });
 
+    
+
+    //get the categories 
+
+    app.get('/get-category', async(req,res)=> {
+      try{
+        const categories = await categoryCollection.find({}).toArray();
+        res.send(categories);
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
+    })
+
 
     //get user role
     
