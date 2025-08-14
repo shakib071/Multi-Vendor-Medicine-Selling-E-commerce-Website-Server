@@ -4,7 +4,11 @@ const app = express()
 require('dotenv').config();
 const cors = require('cors');
 const port = 5000 
+const admin = require("firebase-admin");
 
+
+const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY,'base64').toString('utf-8');
+const serviceAccount = JSON.parse(decoded);
 
 //middleware 
 app.use(cors());
@@ -26,6 +30,32 @@ const client = new MongoClient(uri, {
 });
 
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const varifyFirebaseToken = async(req,res,next) => {
+  const authHeader = req.headers?.authorization;
+
+  if(!authHeader || !authHeader.startsWith(`Bearer `)){
+    return res.status(401).send({message : 'unauthorized access'});
+  }
+
+  const token = authHeader.split(' ')[1];
+  try{
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.decoded = decoded;
+    // console.log(decoded);
+  }
+  catch(error){
+    return res.status(401).send({message : 'unauthorized access'});
+  }
+  // console.log(token);
+  next();
+}
+
+
+
 
 async function run() {
   try {
@@ -33,6 +63,7 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db('medicineSellDB').collection('users');
+    const medicinesCollection = client.db('medicineSellDB').collection('medicines');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -86,6 +117,24 @@ async function run() {
         }
     });
 
+    //add saler added saler medicine to database 
+
+    app.post('/medicines', async(req,res)=> {
+      const medicinesData = req.body;
+      const name = req.body.name;
+      try{
+        const existingMedicine = await medicinesCollection.findOne({name});
+        // console.log(medicinesData,name,existingMedicine);
+        if(existingMedicine){
+          return res.status(200).send({message: 'Medicine Already exists'});
+        }
+        const result = await medicinesCollection.insertOne(medicinesData);
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).send({message: 'server error'});
+      }
+    });
 
 
 
