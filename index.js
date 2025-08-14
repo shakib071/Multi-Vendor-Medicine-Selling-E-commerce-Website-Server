@@ -226,7 +226,54 @@ async function run() {
         res.status(500).send({error: 'Update Failed'});
 
       }
-    })
+    });
+
+    //update Category 
+
+    app.patch('/update-category/:id',async(req,res)=> {
+      const id = req.params.id;
+      const {categoryName,categoryImage} = req.body;
+
+      try{
+        if(categoryImage){
+          const result = await  categoryCollection.updateOne(
+            {_id: new ObjectId(id)},
+            {
+              $set: {
+                categoryName: categoryName,
+                categoryImage : categoryImage
+              }
+            }
+          );
+          res.send(result);
+        }
+        else{
+          const result = await  categoryCollection.updateOne(
+            {_id: new ObjectId(id)},
+            {
+              $set: {
+                categoryName: categoryName
+                
+              }
+            }
+          );
+          res.send(result);
+        }
+      }
+      catch(error){
+        res.status(500).send({error: 'Update Failed'});
+      }
+    });
+
+
+    //delete a catagory 
+
+    app.delete('/delete-category/:id',async(req,res)=> {
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)};
+      const result = await categoryCollection.deleteOne(query);
+      res.send(result);
+    });
 
 
 
