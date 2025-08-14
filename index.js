@@ -65,6 +65,7 @@ async function run() {
     const usersCollection = client.db('medicineSellDB').collection('users');
     const medicinesCollection = client.db('medicineSellDB').collection('medicines');
     const categoryCollection = client.db('medicineSellDB').collection('categories');
+    const cartCollection = client.db('medicineSellDB').collection('cart');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -163,6 +164,18 @@ async function run() {
     });
 
 
+    //get cart data for specific user 
+
+    app.get('/cart-medicines/:userId', async(req,res)=>{
+      const userId = req.params.userId;
+      // console.log(userId);
+    
+      const query = {userId : userId}
+      const result = await cartCollection.findOne(query);
+      res.send(result);
+    });
+
+
     //save user
 
     app.post('/users',async(req,res)=> {
@@ -242,7 +255,51 @@ async function run() {
       catch(error){
         res.status(500).send({message: 'server error'});
       }
-    })
+    });
+
+
+    //add cart for user to db
+
+    app.post('/cart/:userId',async(req,res)=> {
+      const userId = req.params.userId;
+      const medicineData = req.body;
+
+      if (!medicineData || !medicineData.name) {
+        return res.status(400).send({ message: "Medicine data is invalid" });
+      }
+
+      try{
+        const cart = await cartCollection.findOne({userId});
+
+        if(cart){
+          const existingItem = cart.medicines.find(item => item.name === medicineData.name);
+          if(existingItem){
+            return res.status(200).send({message: 'Items Already exists'});
+          }
+          const updatedCart = await cartCollection.findOneAndUpdate(
+            {userId},
+            {$push: {medicines: medicineData}},
+            {new:true}
+          )
+          return res.send(updatedCart);
+        }
+        else{
+          const newCart = await cartCollection.insertOne({
+            userId,
+            medicines: [medicineData],
+            createdAt: new Date(),
+            
+          });
+
+          return res.send(newCart);
+
+        }
+      }
+      catch{
+        return res.status(500).send({ message: "Internal Server Error" });
+      }
+
+    });
 
 
 
@@ -299,6 +356,40 @@ async function run() {
       catch(error){
         res.status(500).send({error: 'Update Failed'});
       }
+    });
+
+    //increment and decrement of quantity 
+
+    app.patch('/incOrDec-cat-quantity/:id',async(req,res)=> {
+      const id = req.params.id;
+      const {name,increment} = req.body;
+      
+      if(increment){
+        const result = await cartCollection.updateOne(
+        {
+          userId: id,
+          "medicines.name": name,
+        },
+        {
+          $inc: {"medicines.$.quantity": 1}
+        }
+        )
+        res.send(result);
+      }
+      else{
+        const result = await cartCollection.updateOne(
+        {
+          userId: id,
+          "medicines.name": name,
+        },
+        {
+          $inc: {"medicines.$.quantity": -1}
+        }
+        )
+        res.send(result);
+      }
+
+      
     });
 
 
