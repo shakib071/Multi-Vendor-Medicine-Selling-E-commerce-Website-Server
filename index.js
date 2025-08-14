@@ -69,11 +69,48 @@ async function run() {
     res.send("Hello world from server");
     });
 
+    //get saler added medicine 
+
+    app.get('/saler-medicine/:uid', varifyFirebaseToken, async(req,res)=> {
+      const uid = req.params.uid;
+
+      if(req.decoded.uid != uid){
+         return res.status(403).message({message: 'forbidden access'});
+      }
+
+      try{
+        const query = {"saler.uid": uid}
+        const salerMedicines = await medicinesCollection.find(query).toArray();
+        res.send(salerMedicines);
+      }
+      catch{
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    //get all users 
+
+    app.get('/users/:uid', async(req,res)=> {
+       const uid = req.params.uid;
+       const user = await usersCollection.findOne({uid});
+       if(!user || user.role != 'admin'){
+        return res.status(401).send({message : 'unauthorized access'});
+       }
+
+      try {
+        const users = await usersCollection.find({}).toArray();
+        res.send(users);
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
     //get user role
     
     app.get('/users-role/:uid', async(req,res)=> {
       const uid = req.params.uid;
-
+      
       try{
         const user = await usersCollection.findOne({uid});
         if(!user){
