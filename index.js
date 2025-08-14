@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 require('dotenv').config();
 const cors = require('cors');
@@ -175,6 +175,22 @@ async function run() {
 
 
 
+    // update operation for change role 
+
+    app.patch('/update-role/:id',async(req,res)=> {
+      const id = req.params.id;
+      const newRole = req.body;
+      try{
+        const filter = {_id : new ObjectId(id)};
+        const updatedRole = {$set : newRole};
+        const result = await usersCollection.updateOne(filter,updatedRole);
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).send({error: 'Update Failed'});
+
+      }
+    })
 
 
 
