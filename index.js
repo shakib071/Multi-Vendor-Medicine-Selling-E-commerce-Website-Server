@@ -64,6 +64,7 @@ async function run() {
 
     const usersCollection = client.db('medicineSellDB').collection('users');
     const medicinesCollection = client.db('medicineSellDB').collection('medicines');
+    const categoryCollection = client.db('medicineSellDB').collection('categories');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -88,6 +89,7 @@ async function run() {
       }
     });
 
+
     //get all users 
 
     app.get('/users/:uid', async(req,res)=> {
@@ -105,6 +107,7 @@ async function run() {
         res.status(500).json({ message: 'Server error' });
       }
     });
+
 
     //get user role
     
@@ -172,6 +175,25 @@ async function run() {
         res.status(500).send({message: 'server error'});
       }
     });
+
+
+    //add category to database 
+
+    app.post('/category', async(req,res) => {
+      const categoryData = req.body;
+      const categoryName = req.body.categoryName;
+      try{
+        const ifCategoryExist = await categoryCollection.findOne({categoryName});
+        if(ifCategoryExist){
+          return res.status(200).send({message: 'Category Already exists'});
+        }
+        const result = await categoryCollection.insertOne(categoryData);
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).send({message: 'server error'});
+      }
+    })
 
 
 
