@@ -403,7 +403,32 @@ async function run() {
     });
 
 
+    //delet  the entire user cart
 
+
+    app.delete('/delete-cart/:userId',async(req,res)=> {
+      const userId = req.params.userId;
+      const query = {userId: userId};
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    // delete a single cart item 
+
+    app.delete('/delete-cart-item/:userId/med/:medicineName',async(req,res)=> {
+      try{
+        const { userId, medicineName } = req.params;
+
+        const result = await  cartCollection.updateOne(
+          {userId},
+          { $pull: { medicines: { name: medicineName } } }
+        );
+        res.send(result);
+      }
+      catch(error){
+        return res.status(500).send({ message: "Internal Server Error" });
+      }
+    })
 
 
     app.listen(port,() => {
