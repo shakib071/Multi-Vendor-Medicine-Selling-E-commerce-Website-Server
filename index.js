@@ -153,6 +153,16 @@ async function run() {
     });
 
 
+    //get medicine by category 
+
+    app.get('/category-medicine/:category',async(req,res)=>{
+      const category = req.params.category;
+      const query = {category:category};
+      const result = await medicinesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+
     //save user
 
     app.post('/users',async(req,res)=> {
@@ -193,6 +203,14 @@ async function run() {
         if(existingMedicine){
           return res.status(200).send({message: 'Medicine Already exists'});
         }
+        const category = req.body.category;
+         const categoryresult = await  categoryCollection.updateOne(
+            {categoryName: category},
+            {
+              $inc: {noOfMedicine: 1}
+            }
+          );
+          
         const result = await medicinesCollection.insertOne(medicinesData);
         res.send(result);
       }
@@ -205,8 +223,14 @@ async function run() {
     //add category to database 
 
     app.post('/category', async(req,res) => {
-      const categoryData = req.body;
+     
       const categoryName = req.body.categoryName;
+      const categoryImage = req.body.categoryImage;
+       const categoryData = {
+          categoryName,
+          categoryImage,
+          noOfMedicine: parseInt(0)
+       }
       try{
         const ifCategoryExist = await categoryCollection.findOne({categoryName});
         if(ifCategoryExist){
@@ -252,7 +276,8 @@ async function run() {
             {
               $set: {
                 categoryName: categoryName,
-                categoryImage : categoryImage
+                categoryImage : categoryImage,
+                
               }
             }
           );
