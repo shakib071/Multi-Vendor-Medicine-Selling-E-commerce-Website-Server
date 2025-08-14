@@ -120,8 +120,19 @@ async function run() {
       catch(error){
         res.status(500).json({ message: 'Server error' });
       }
-    })
+    });
 
+    // get all data 
+
+    app.get('/all-medicines',async(req,res)=>{
+      try{
+        const allMedicines = await medicinesCollection.find({}).toArray();
+        res.send(allMedicines);
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
 
     //get user role
     
