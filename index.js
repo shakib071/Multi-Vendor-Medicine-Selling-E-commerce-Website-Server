@@ -69,6 +69,7 @@ async function run() {
     const categoryCollection = client.db('medicineSellDB').collection('categories');
     const cartCollection = client.db('medicineSellDB').collection('cart');
     const SalerSoldCollection = client.db('medicineSellDB').collection('sold');
+    const UserPurchasedCollection = client.db('medicineSellDB').collection('purchased');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -335,6 +336,38 @@ async function run() {
         return res.status(500).send({ message: "Internal Server Error" });
       }
     })
+
+
+    //user purchased medicines 
+
+    app.post(`/user-purchased-items/:userId`,async(req,res)=> {
+      const userId = req.params.userId;
+      const {purchasedItem}= req.body;
+
+        try{
+          const userInfo = await UserPurchasedCollection.findOne({userId});
+          if(userInfo){
+            const userPurchased = await UserPurchasedCollection.findOneAndUpdate(
+              {userId},
+              {$push: {purchasedItem: purchasedItem}},
+              {new:true}
+            )
+
+          res.send(userPurchased);
+        }
+        else{
+          const newUserPurchased = await UserPurchasedCollection.insertOne({
+            userId,
+            purchasedItem: [purchasedItem],
+            purchasedAt: new Date(),
+          });
+          res.send(newUserPurchased);
+        }
+      }
+      catch(error){
+        return res.status(500).send({ message: "Internal Server Error" });
+      }
+    });
 
     //stripe payment system 
 
