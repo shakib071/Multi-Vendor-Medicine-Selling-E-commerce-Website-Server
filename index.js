@@ -180,6 +180,17 @@ async function run() {
     });
 
 
+    //get user purchased data 
+
+    app.get('/purchased-med/:userId',async(req,res)=> {
+      const userId = req.params.userId;
+
+      const query = {userId: userId};
+      const result = await UserPurchasedCollection.findOne(query);
+      res.send(result);
+    });
+
+
     //save user
 
     app.post('/users',async(req,res)=> {
