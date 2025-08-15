@@ -68,6 +68,7 @@ async function run() {
     const medicinesCollection = client.db('medicineSellDB').collection('medicines');
     const categoryCollection = client.db('medicineSellDB').collection('categories');
     const cartCollection = client.db('medicineSellDB').collection('cart');
+    const SalerSoldCollection = client.db('medicineSellDB').collection('sold');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -272,7 +273,7 @@ async function run() {
 
       try{
         const cart = await cartCollection.findOne({userId});
-
+        
         if(cart){
           const existingItem = cart.medicines.find(item => item.name === medicineData.name);
           if(existingItem){
@@ -303,6 +304,37 @@ async function run() {
 
     });
 
+
+    //saler sold data 
+
+    app.post('/saler-sold-items/:userId', async(req,res)=> {
+      const userId = req.params.userId;
+      const {soldItems}= req.body;
+
+      try{
+        const salerInfo = await SalerSoldCollection.findOne({userId});
+        if(salerInfo){
+          const salerSold = await SalerSoldCollection.findOneAndUpdate(
+            {userId},
+            {$push: {soldItems: soldItems}},
+            {new:true}
+          )
+
+          res.send(salerSold);
+        }
+        else{
+          const newSalerSold = await SalerSoldCollection.insertOne({
+            userId,
+            soldItems: [soldItems],
+            createdAt: new Date(),
+          });
+          res.send(newSalerSold);
+        }
+      }
+      catch(error){
+        return res.status(500).send({ message: "Internal Server Error" });
+      }
+    })
 
     //stripe payment system 
 
