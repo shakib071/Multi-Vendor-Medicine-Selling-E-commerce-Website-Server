@@ -7,6 +7,8 @@ const port = 5000
 const admin = require("firebase-admin");
 
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY,'base64').toString('utf-8');
 const serviceAccount = JSON.parse(decoded);
 
@@ -301,6 +303,24 @@ async function run() {
 
     });
 
+
+    //stripe payment system 
+
+    app.post('/create-chechout-session', async(req,res)=> {
+      try{
+        const {totalAmount} = req.body; //total in usd
+        const amountInCents = totalAmount*100;
+        const paymentIntent = await stripe.paymentIntents.create({
+          payment_method_types: ["card"],
+          currency: 'usd',
+          amount: amountInCents,
+        });
+        res.send({ clientSecret: paymentIntent.client_secret });
+      }
+      catch(error){
+        res.status(500).send({error: error.message});
+      }
+    })
 
 
     // update operation for change role 
