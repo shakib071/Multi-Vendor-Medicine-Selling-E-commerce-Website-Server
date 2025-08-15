@@ -70,6 +70,7 @@ async function run() {
     const cartCollection = client.db('medicineSellDB').collection('cart');
     const SalerSoldCollection = client.db('medicineSellDB').collection('sold');
     const UserPurchasedCollection = client.db('medicineSellDB').collection('purchased');
+    const buySaleIdCollection = client.db('medicineSellDB').collection('IdToTrackSaleandBuy');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -188,6 +189,23 @@ async function run() {
       const query = {userId: userId};
       const result = await UserPurchasedCollection.findOne(query);
       res.send(result);
+    });
+
+    // get saler sold data 
+
+    app.get('/sold-items/:userId', async(req,res)=> {
+      const userId = req.params.userId;
+      const query = {userId : userId};
+      const result = await SalerSoldCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get('/get-buy-sale-id',async(req,res)=> {
+       const id= "689f93bcbdbb5098ab5b34ce";
+       const query = {_id : new ObjectId(id)};
+       const result = await buySaleIdCollection.findOne(query);
+       await buySaleIdCollection.updateOne(query ,{$inc: { idSB: 1 } });
+       res.send(result);
     });
 
 
