@@ -242,6 +242,13 @@ async function run() {
 
     });
 
+    //get all advertisement 
+
+    app.get('/get-all-advertisement', async(req,res)=> {
+      const result = await advertiseemtCollection.find({}).toArray();
+      res.send(result);
+    });
+
 
     //save user
 
