@@ -203,9 +203,24 @@ async function run() {
     app.get('/get-buy-sale-id',async(req,res)=> {
        const id= "689f93bcbdbb5098ab5b34ce";
        const query = {_id : new ObjectId(id)};
-       const result = await buySaleIdCollection.findOne(query);
-       await buySaleIdCollection.updateOne(query ,{$inc: { idSB: 1 } });
-       res.send(result);
+       const result = await buySaleIdCollection.updateOne(query ,{$inc: { idSB: 1 } });
+       const result2= await buySaleIdCollection.findOne(query);
+       res.send(result2);
+    });
+
+    // app.patch('/increment-buy-sale-id',async(req,res)=> {
+    //   const id= "689f93bcbdbb5098ab5b34ce";
+    //   const query = {_id : new ObjectId(id)};
+    //   const result = await buySaleIdCollection.updateOne(query ,{$inc: { idSB: 1 } });
+    //   res.send();
+    // })
+
+
+    //get all purchased medicines 
+
+    app.get('/all-purchased-med',async(req,res)=> {
+      const result = await UserPurchasedCollection.find({}).toArray();
+      res.send(result);
     });
 
 
@@ -403,7 +418,7 @@ async function run() {
     app.post('/create-chechout-session', async(req,res)=> {
       try{
         const {totalAmount} = req.body; //total in usd
-        const amountInCents = totalAmount*100;
+        const amountInCents = Math.round(totalAmount * 100);
         const paymentIntent = await stripe.paymentIntents.create({
           payment_method_types: ["card"],
           currency: 'usd',
@@ -504,6 +519,35 @@ async function run() {
       }
 
       
+    });
+
+    
+
+    //update paid status of saler and buyer 
+
+    app.patch('/update-paid-status/:sbId',async(req,res)=> {
+     try{
+         const sbId = parseInt(req.params.sbId);
+         if (isNaN(sbId)) {
+          return res.status(400).send({ error: "Invalid sbId" });
+          }
+
+        const result = await UserPurchasedCollection.updateOne(
+          {"purchasedItem.sbId" : sbId},
+          {$set: {"purchasedItem.$.paid_status" : "paid"}},
+        );
+        const result2 = await SalerSoldCollection.updateOne(
+          {"soldItems.sbId" : sbId},
+          {$set: {"soldItems.$.paid_status" : "paid"}},
+        )
+        res.send({result,result2});
+      }
+      catch(error){
+        res.status(500).send({ 
+          error: "Internal server error",
+          details: error.message 
+          });
+      }
     });
 
 
