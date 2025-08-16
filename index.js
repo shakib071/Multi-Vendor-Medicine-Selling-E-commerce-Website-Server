@@ -466,6 +466,27 @@ async function run() {
     });
 
 
+    //update  advertisement status for slide 
+
+    app.patch('/add-ad-to-slide/:id',async(req,res)=> {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const {Status} = req.body;
+      try{
+        const result = await advertiseemtCollection.updateOne(
+          filter,
+          {$set: {status : Status} }
+        )
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).send({error: 'Update Failed'});
+
+      }
+      
+    });
+
+
     // update operation for change role 
 
     app.patch('/update-role/:id',async(req,res)=> {
