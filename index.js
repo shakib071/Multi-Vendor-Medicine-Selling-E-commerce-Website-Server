@@ -71,6 +71,7 @@ async function run() {
     const SalerSoldCollection = client.db('medicineSellDB').collection('sold');
     const UserPurchasedCollection = client.db('medicineSellDB').collection('purchased');
     const buySaleIdCollection = client.db('medicineSellDB').collection('IdToTrackSaleandBuy');
+    const advertiseemtCollection = client.db('medicineSellDB').collection('advertisement');
 
     app.get('/',(req,res)=> {
     res.send("Hello world from server");
@@ -436,7 +437,15 @@ async function run() {
       catch(error){
         res.status(500).send({error: error.message});
       }
-    })
+    });
+
+    //add advertisement to db 
+
+    app.post('/add-advertisement',async(req,res)=> {
+      const {advertisement} = req.body;
+      const result = await advertiseemtCollection.insertOne(advertisement);
+      res.send(result);
+    });
 
 
     // update operation for change role 
