@@ -249,6 +249,17 @@ async function run() {
       res.send(result);
     });
 
+    // get top 10 discounted 
+
+    app.get('/top-discounted', async(req,res)=> {
+      try{
+        const result = await medicinesCollection.find().sort({discount: -1}).limit(10).toArray();
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).send({ message: "Error fetching discounted medicines", error });
+      }
+    });
 
     //save user
 
