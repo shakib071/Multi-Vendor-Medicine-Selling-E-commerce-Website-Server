@@ -232,6 +232,17 @@ async function run() {
     });
 
 
+    //get user advertisement 
+
+    app.get('/get-saler-ad/:userId',async(req,res)=> {
+      const userId = req.params.userId;
+      const query = {added_by : userId}
+      const result = await advertiseemtCollection.find(query).toArray();
+      res.send(result);
+
+    });
+
+
     //save user
 
     app.post('/users',async(req,res)=> {
