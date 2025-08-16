@@ -223,6 +223,13 @@ async function run() {
       res.send(result);
     });
 
+    //get all sold medicines 
+
+    app.get('/all-sold-med',async(req,res) => {
+      const result = await SalerSoldCollection.find({}).toArray();
+      res.send(result);
+    });
+
 
     //save user
 
