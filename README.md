@@ -207,8 +207,7 @@ All protected routes require a Firebase JWT token in the Authorization header:
 ## Setup
 
 1. Clone the repository:
-   - ```bash
-   - git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
+   - ```bash git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
    - cd medicine-sell-platform
 2. Install dependencies:
    - npm install
