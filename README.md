@@ -208,11 +208,11 @@ All protected routes require a Firebase JWT token in the Authorization header:
 
 1. Clone the repository:
     ```bash 
-   - git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
-   - cd medicine-sell-platform
+    git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
+    cd medicine-sell-platform
 2. Install dependencies:
     ```bash 
-   - npm install
+    npm install
 
 3. Set up Firebase
 
@@ -224,8 +224,8 @@ All protected routes require a Firebase JWT token in the Authorization header:
 
 5. Run the server:
     ```bash 
-   - node index.js
-   - or install nodemon and run nodemon index.js
+    node index.js
+    or install nodemon and run nodemon index.js
 
 6. Create .env file:
 
