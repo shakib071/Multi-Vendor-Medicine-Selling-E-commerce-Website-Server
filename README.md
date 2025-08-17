@@ -211,6 +211,7 @@ All protected routes require a Firebase JWT token in the Authorization header:
    - git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
    - cd medicine-sell-platform
 2. Install dependencies:
+    ```bash 
    - npm install
 
 3. Set up Firebase
@@ -222,6 +223,7 @@ All protected routes require a Firebase JWT token in the Authorization header:
   - Get your secret key from Stripe Dashboard
 
 5. Run the server:
+    ```bash 
    - node index.js
    - or install nodemon and run nodemon index.js
 
