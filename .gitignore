@@ -1,3 +1,4 @@
 node_modules
 .env
 medicine-selling-website-firebase-admin.json
+.vercel

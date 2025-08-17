@@ -25,7 +25,7 @@ This is the **backend** for a **MERN stack multi-vendor medicine selling platfor
 - **Client Side:** [https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-client.git](https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-client.git)
 - **ServerSide:** [https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server](https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server)
 
-- **Live Site URL:** [https://your-website-link.com](https://your-website-link.com)
+- **Live Site URL:** [https://medicine-selling-website-3ee12.web.app/](https://medicine-selling-website-3ee12.web.app/)
 
 ---
 
