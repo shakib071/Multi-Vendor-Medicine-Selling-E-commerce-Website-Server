@@ -77,6 +77,13 @@ async function run() {
     res.send("Hello world from server");
     });
 
+    //get medicine count 
+
+    app.get('/medicineCount',async(req,res)=>{
+      const count = await medicinesCollection.countDocuments();
+      res.send({count : count});
+    });
+
     //get saler added medicine 
 
     app.get('/saler-medicine/:uid', varifyFirebaseToken, async(req,res)=> {
@@ -132,8 +139,14 @@ async function run() {
     // get all data 
 
     app.get('/all-medicines',async(req,res)=>{
+      const limit = parseInt(req.query.limit);
+      const page = parseInt(req.query.page);
+      
+      
       try{
-        const allMedicines = await medicinesCollection.find({}).toArray();
+
+        const skip = page * limit ;
+        const allMedicines = await medicinesCollection.find({}).skip(skip).limit(limit).toArray();
         res.send(allMedicines);
       }
       catch(error){
@@ -160,13 +173,36 @@ async function run() {
     });
 
 
+    //get category medicine count 
+
+    app.get('/category-count/:category',async(req,res)=> {
+      const category = req.params.category;
+      try{
+        const query = {category:category};
+        const count = await medicinesCollection.countDocuments(query);
+        res.send({count:count});
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
+      
+    });
+
     //get medicine by category 
 
     app.get('/category-medicine/:category',async(req,res)=>{
-      const category = req.params.category;
-      const query = {category:category};
-      const result = await medicinesCollection.find(query).toArray();
-      res.send(result);
+      const limit = parseInt(req.query.limit);
+      const page = parseInt(req.query.page);
+      try{
+        const skip = page * limit ;
+        const category = req.params.category;
+        const query = {category:category};
+        const result = await medicinesCollection.find(query).skip(skip).limit(limit).toArray();
+        res.send(result);
+      }
+      catch(error){
+        res.status(500).json({ message: 'Server error' });
+      }
     });
 
 
