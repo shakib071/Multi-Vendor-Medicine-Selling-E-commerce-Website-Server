@@ -20,6 +20,14 @@ This is the **backend** for a **MERN stack multi-vendor medicine selling platfor
 
 ---
 
+## Repositories 
+
+- **Client Side:** [https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-client.git](https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-client.git)\
+- **ServerSide:** [https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server](https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server)
+
+
+---
+
 
 ## Features
 
@@ -200,7 +208,7 @@ All protected routes require a Firebase JWT token in the Authorization header:
 
 1. Clone the repository:
    - ```bash
-   - git clone https://github.com/yourusername/medicine-sell-platform.git
+   - git clone https://github.com/shakib071/Multi-Vendor-Medicine-Selling-E-commerce-Website-Server.git
    - cd medicine-sell-platform
 2. Install dependencies:
    - npm install
