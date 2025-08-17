@@ -106,8 +106,11 @@ async function run() {
 
     //get all users 
 
-    app.get('/users/:uid', async(req,res)=> {
+    app.get('/users/:uid', varifyFirebaseToken ,async(req,res)=> {
        const uid = req.params.uid;
+       if(req.decoded.uid != uid){
+         return res.status(403).message({message: 'forbidden access'});
+       }
        const user = await usersCollection.findOne({uid});
        if(!user || user.role != 'admin'){
         return res.status(401).send({message : 'unauthorized access'});
@@ -141,13 +144,33 @@ async function run() {
     app.get('/all-medicines',async(req,res)=>{
       const limit = parseInt(req.query.limit);
       const page = parseInt(req.query.page);
+      const searchQuery = req.query.searchQuery || "";
+      const sortOrder = parseInt(req.query.sortOrder) || 0;
       
+    
       
       try{
-
+        let query = {};
+        if (searchQuery && searchQuery.trim() !== "") {
+          query = {
+            $or: [
+              { name: { $regex: searchQuery, $options: "i" } },
+              { genericName: { $regex: searchQuery, $options: "i" } },
+              { company: { $regex: searchQuery, $options: "i" } },
+              { category: { $regex: searchQuery, $options: "i" } }
+            ]
+          };
+        }
         const skip = page * limit ;
-        const allMedicines = await medicinesCollection.find({}).skip(skip).limit(limit).toArray();
-        res.send(allMedicines);
+        let cursor = medicinesCollection.find(query);
+        const totalCount = await medicinesCollection.countDocuments(query);
+        if (sortOrder != 0) {
+          cursor = cursor.sort({ price: sortOrder });
+        }
+
+        cursor = cursor.skip(skip).limit(limit);
+        const allMedicines = await cursor.toArray();
+        res.send({allMedicines:allMedicines,count:totalCount});
       }
       catch(error){
         res.status(500).json({ message: 'Server error' });
@@ -156,9 +179,11 @@ async function run() {
 
     //get user role
     
-    app.get('/users-role/:uid', async(req,res)=> {
+    app.get('/users-role/:uid', varifyFirebaseToken ,async(req,res)=> {
       const uid = req.params.uid;
-      
+      if(req.decoded.uid != uid){
+         return res.status(403).message({message: 'forbidden access'});
+      }
       try{
         const user = await usersCollection.findOne({uid});
         if(!user){
@@ -208,9 +233,12 @@ async function run() {
 
     //get cart data for specific user 
 
-    app.get('/cart-medicines/:userId', async(req,res)=>{
+    app.get('/cart-medicines/:userId', varifyFirebaseToken, async(req,res)=>{
       const userId = req.params.userId;
-      // console.log(userId);
+      
+      if(req.decoded.uid != userId){
+         return res.status(403).message({message: 'forbidden access'});
+      }
     
       const query = {userId : userId}
       const result = await cartCollection.findOne(query);
@@ -220,9 +248,11 @@ async function run() {
 
     //get user purchased data 
 
-    app.get('/purchased-med/:userId',async(req,res)=> {
+    app.get('/purchased-med/:userId', varifyFirebaseToken ,async(req,res)=> {
       const userId = req.params.userId;
-
+      if(req.decoded.uid != userId){
+         return res.status(403).message({message: 'forbidden access'});
+      }
       const query = {userId: userId};
       const result = await UserPurchasedCollection.findOne(query);
       res.send(result);
@@ -230,8 +260,11 @@ async function run() {
 
     // get saler sold data 
 
-    app.get('/sold-items/:userId', async(req,res)=> {
+    app.get('/sold-items/:userId', varifyFirebaseToken, async(req,res)=> {
       const userId = req.params.userId;
+      if(req.decoded.uid != userId){
+         return res.status(403).message({message: 'forbidden access'});
+      }
       const query = {userId : userId};
       const result = await SalerSoldCollection.findOne(query);
       res.send(result);
@@ -270,8 +303,11 @@ async function run() {
 
     //get user advertisement 
 
-    app.get('/get-saler-ad/:userId',async(req,res)=> {
+    app.get('/get-saler-ad/:userId',varifyFirebaseToken,async(req,res)=> {
       const userId = req.params.userId;
+      if(req.decoded.uid != userId){
+         return res.status(403).message({message: 'forbidden access'});
+      }
       const query = {added_by : userId}
       const result = await advertiseemtCollection.find(query).toArray();
       res.send(result);
@@ -698,8 +734,8 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
