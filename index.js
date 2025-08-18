@@ -18,7 +18,6 @@ app.use(cors({
   origin: ['https://medicine-selling-website-3ee12.web.app','http://localhost:5173'],
   credentials: true
 }));
-app.u
 app.use(express.json());
 
 
